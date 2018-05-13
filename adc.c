@@ -2,24 +2,28 @@
 #include "define_function.h"
 #include "define_data.h"
 
-//ADC模式选择
-void adc()
+void adc_battery()
 {
-	if(if_adc)
-	{
-		SRADCON1=0X80;			//使能AD转换，VDD作参考电压
-		SRADCON2=0X10;			//设置pt3.1口为输入通道
-		PT3CON=0x02;			//设置pt3.1为模拟口
-		ad_voltage_collect();
-		ad_deal();
-	}                       	
-	else                    	
-	{                       	
-		SRADCON1=0X81;      	//使能AD转换，P3.0外部输入作参考电压    
-		SRADCON2=0Xa0;			//设置输入通道(AIN10)为内部参考电压及设置参考电压大小
-		PT3CON=0X01;        	//设置pt3.0为模拟口
-		ad_voltage_collect();	
-	}	
+	SRADCON1=0X80;			//使能AD转换，VDD作参考电压
+	SRADCON2=0X10;			//设置pt3.1口为输入通道
+	ad_voltage_collect();
+	battery_deal();
+}
+
+void adc_temp1()
+{
+	SRADCON1=0X80;			//使能AD转换，VDD作参考电压
+	SRADCON2=0X30;			//设置pt3.3口为输入通道
+	ad_voltage_collect();
+	temp_deal()
+}
+
+void adc_temp2()
+{
+	SRADCON1=0X80;			//使能AD转换，VDD作参考电压
+	SRADCON2=0X40;			//设置pt3.4口为输入通道
+	ad_voltage_collect();
+	temp_deal()
 }
 
 //ADC采集函数
@@ -43,7 +47,7 @@ void ad_voltage_collect()
 	AdData>>=3;					        //求八次平均，最终结果存在AdData寄存器	
 }
 //ADC处理函数
-void ad_deal()
+void battery_deal()
 {	
 	asm("movlw	TabStartAddr");
 	asm("movwf	_EADRL");
@@ -55,16 +59,15 @@ void ad_deal()
 	asm("movfw	_EDATH");
 	asm("movwf	_CurTabData+1");		//表值
 	
-	if(AdData<CurTabData)					//比较表值和采集到的AD值
+	if(AdData<CurTabData)				//比较表值和采集到的AD值
 	{									//若AD值小则关led1,led2指示灯                 
 		R_AdcStation2_Cnt=0;                                                          
 		R_AdcStation3_Cnt=0;                                                          
 		R_AdcStation1_Cnt++;                                                          
 		if(R_AdcStation1_Cnt>=20)       //滤波计数                                    
-		{                               //连续20次AD值比第一个表值小则关掉led1，led2  
-			R_AdcStation1_Cnt=0;                                                      
-			led1=0;                     //关led1，led2                                
-			led2=0;                                                                   
+		{                               //连续20次AD值比第一个表值小则shutdown  
+			R_AdcStation1_Cnt=0;
+			low_battery_shutdown = 1;
 		}                                                                             
 	}                                                                                 
 	else 			
@@ -79,29 +82,66 @@ void ad_deal()
 		asm("movfw	_EDATH");
 		asm("movwf	_CurTabData+1");	//表值
 
-		if(AdData<CurTabData)                //比较表值和采集到的AD值                    
+		if(AdData<CurTabData)           //比较表值和采集到的AD值                    
 		{                         		
 			R_AdcStation1_Cnt=0;
 			R_AdcStation3_Cnt=0;
 			R_AdcStation2_Cnt++;
 			if(R_AdcStation2_Cnt>=10)	//滤波计数                                       
-			{                           //连续10次AD值比第二个表值小则亮led1，灭led2     
-				R_AdcStation2_Cnt=0;                                                     
-				led1=1;                 //亮led1，灭led2                                 
-				led2=0;	                                                                 
+			{                           //连续10次AD值比第二个表值小则warning     
+				R_AdcStation2_Cnt=0;
+				low_battery_warning = 1;
 			}                                                                            
 		}                                                                                
-		else                                                                             
-		{                               //若AD值大则亮led2                               
-			R_AdcStation1_Cnt=0;                                                         
-			R_AdcStation2_Cnt=0;                                                         
-			R_AdcStation3_Cnt++;                                                         
-			if(R_AdcStation3_Cnt>=10)   //滤波计数                                       
-			{                           //连续10次AD值比第二个表值大则亮led2，灭led1     
-				R_AdcStation3_Cnt=0;                                                     
-				led1=0;                 //亮led2，灭led1                                 
-				led2=1;	
-			}
-		}
 	}
+}
+
+void temp_deal()
+{
+	asm("movlw	TabStartAddr");
+	asm("movwf	_EADRL");
+	asm("movlw	.high(TabStartAddr)");	//取表地址高位
+	asm("movwf	_EADRH");				//赋读表地址	
+	asm("movp");						//读表
+	asm("nop");
+	asm("movwf	_CurTabData");
+	asm("movfw	_EDATH");
+	asm("movwf	_CurTabData+1");		//表值
+	
+	if(AdData<CurTabData)				//比较表值和采集到的AD值
+	{									//若AD值小则关led1,led2指示灯                 
+		R_AdcStation2_Cnt=0;                                                          
+		R_AdcStation3_Cnt=0;                                                          
+		R_AdcStation1_Cnt++;                                                          
+		if(R_AdcStation1_Cnt>=20)       //滤波计数                                    
+		{                               //连续20次AD值比第一个表值小则shutdown  
+			R_AdcStation1_Cnt=0;
+			low_battery_shutdown = 1;
+		}                                                                             
+	}                                                                                 
+	else 			
+	{                                   //若AD值小则亮led1                            
+		asm("movlw	1");
+		asm("addwf	_EADRL,1");
+		asm("clrf	_WORK");
+		asm("addwfc _EADRH,1");			//赋读表地址
+		asm("movp");					//读表
+		asm("nop");
+		asm("movwf	_CurTabData");
+		asm("movfw	_EDATH");
+		asm("movwf	_CurTabData+1");	//表值
+
+		if(AdData<CurTabData)           //比较表值和采集到的AD值                    
+		{                         		
+			R_AdcStation1_Cnt=0;
+			R_AdcStation3_Cnt=0;
+			R_AdcStation2_Cnt++;
+			if(R_AdcStation2_Cnt>=10)	//滤波计数                                       
+			{                           //连续10次AD值比第二个表值小则warning     
+				R_AdcStation2_Cnt=0;
+				low_battery_warning = 1;
+			}                                                                            
+		}                                                                                
+	}
+
 }

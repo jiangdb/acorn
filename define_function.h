@@ -21,20 +21,15 @@ void Bit_Initialization(void);					  //位初始化
 adc.c
 -------------------------------------------------*/
 //ADC模式选择
-extern void adc();
+extern void adc_battery();
+extern void adc_temp1();
+extern void adc_temp2();
 //ADC采集函数
 extern void ad_voltage_collect();
 //ADC处理函数
-extern void ad_deal();
-/*-------------------------------------------------
-uart.c
--------------------------------------------------*/
-//uart发送函数
-extern void uart_send(char temp);
-//uart接收函数
-extern void uart_re();
-//uart主函数
-extern void uart();
+extern void battery_deal();
+extern void temp1_deal();
+extern void temp2_deal();
 /*-------------------------------------------------
 lowpower.c
 -------------------------------------------------*/

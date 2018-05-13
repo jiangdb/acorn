@@ -44,8 +44,22 @@ void open_pwm()
 		}		
 	}   
 		
-}       
-	    
+}
+
+//white led
+void open_pwm2()
+{
+	if (!B_pwm2)	            //打开pwm2时只能开启一次，以保证pwm波形的稳定，用B_pwm2控制 
+	{                           //  		若为1则说明已经开启pwm，则不操作直接退出        
+		B_pwm2=1;
+		TM2CON=0x00;
+		TM2RH=0;
+		TM2INH=0;
+		TM2R= CONST_PWM2_TMR;	//100,占空比	
+		TM2IN=CONST_PWM2_TMIN;	//249,频率4kHz
+		TM2CON=0xa1;			//开启pwm2，作蜂鸣器输出
+	}
+}	
 			
         
         

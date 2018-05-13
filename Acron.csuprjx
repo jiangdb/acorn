@@ -1,54 +1,54 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ChipseaProject>
 	<Properties>
-		csChip_csEmual_RamLastAddr="0xFF"
-		csChip_csEmual_SfrLastAddr="0x07F"
-		csChip_csCompl_ComplCodeSize="0x07ff"
-		csChip_csCompl_IsSupportTblp="1"
-		csChip_csCompl_VerRISC="1"
-		csChip_csInf_ID3="0x0041"
-		csChip_csInf_ID2="0x0013"
 		csChip_csInf_ID1="0x0032"
-		csChip_csEmual_CodeLastAddr="0x7FF"
-		LastBuildVersion=""
-		PrevProjectPath=""
+		csChip_csInf_ID2="0x0013"
+		csChip_csInf_ID3="0x0041"
+		csChip_csCompl_VerRISC="1"
+		csChip_csCompl_IsSupportTblp="1"
+		csChip_csCompl_ComplCodeSize="0x07ff"
+		csChip_csEmual_SfrLastAddr="0x07F"
+		csChip_csEmual_RamLastAddr="0xFF"
 		BodyPath=".\\Body\\CSU8RP32XX\\CSU8RP3216\\C"
-		csChip_csInf_Type="CSU8RP3216"
-		ProjectGUID="{EB98EA65-2EAD-4A0D-B622-ED496CEAD472}"
+		PrevProjectPath=""
+		LastBuildVersion=""
+		csChip_csEmual_CodeLastAddr="0x7FF"
 		CLSID="{94A275DF-7936-40A9-A4D3-0930C0B6E0FE}"
+		ProjectGUID="{EB98EA65-2EAD-4A0D-B622-ED496CEAD472}"
+		csChip_csInf_Type="CSU8RP3216"
 		csChip_csInf_Verision="1.0"
-		tools_bin_csu8ice="BIN/csu8dcom.exe"
-		csChip_csEmual_BPEnBitField="13"
 		csChip_csInf_DeviceClassString="CSU8RP32XX"
-		FillDataValue="0xff"
+		csChip_csEmual_BPEnBitField="13"
+		tools_bin_csu8ice="BIN/csu8dcom.exe"
 		LanguageName="C"
-		ActiveCfgName="Release"
-		tools_bin_csu8c="BIN/csu8c.exe"
-		csChip_csCompl_ComplAddCodeSize="0x000"
-		csChip_csCompl_ComplIrWidth="16"
-		ProjectSettingChanged="0"
+		FillDataValue="0xff"
 		BodyName="CSU8RP3216"
-		view_Sol_IRP1="1"
-		csChip_csEmual_CodeFirstAddr="0x000"
-		csChip_csEmual_RamFirstAddr="0x080"
+		ProjectSettingChanged="1"
+		csChip_csCompl_ComplIrWidth="16"
+		csChip_csCompl_ComplAddCodeSize="0x000"
+		tools_bin_csu8c="BIN/csu8c.exe"
+		ActiveCfgName="Release"
 		ProjectType="1"
-		view_Sol_LVD36="0"
-		tools_bin_csu8a="BIN/csu8a.exe"
-		csChip_csEmual_CodeOption="0x0800:0xffff;0x0801:0xfb01;"
-		csChip_csEmual_CopFirstAddr="0x800"
+		csChip_csEmual_RamFirstAddr="0x080"
+		csChip_csEmual_CodeFirstAddr="0x000"
+		view_Sol_IRP1="1"
 		BodySeries="CSU8RP32XX"
-		csChip_csEmual_MBPBitField="14"
+		csChip_csEmual_CopFirstAddr="0x800"
+		csChip_csEmual_CodeOption="0x0800:0xffff;0x0801:0xfb01;"
+		tools_bin_csu8a="BIN/csu8a.exe"
+		view_Sol_LVD36="0"
 		Name="Acron"
-		csChip_csEmual_MaxBPNum="6"
-		csChip_csEmual_SfrFirstAddr="0x000"
+		csChip_csEmual_MBPBitField="14"
 		csChip_csEmual_EmulMemoryWidth="16"
-		tools_bin_LoadRbf="BIN/LoadBbf.exe"
-		csChip_csCompl_ComplLimitCodeSize="0x07ff"
+		csChip_csEmual_SfrFirstAddr="0x000"
+		csChip_csEmual_MaxBPNum="6"
 		csChip_csInf_McuInformation="Chipsea Technologies\n2K×16-bit ROM\n128-byte RAM\n9 channels 12-bit ADC\n17 channels bi-direction I/O port\n1 input only port"
-		csChip_csEmual_CopLastAddr="0x801"
+		csChip_csCompl_ComplLimitCodeSize="0x07ff"
+		tools_bin_LoadRbf="BIN/LoadBbf.exe"
 		Version="5.1.2"
-		csChip_csEmual_LCDEN="0"
+		csChip_csEmual_CopLastAddr="0x801"
 		GUID="{EB98EA65-2EAD-4A0D-B622-ED496CEAD472}"
+		csChip_csEmual_LCDEN="0"
 		tools_bin_rbf="3213.rbf"
 	</Properties>
 	<Configurations>
@@ -119,9 +119,11 @@
 				<Resource>
 				</Resource>
 				<Body>
-					CodeOption=""
+					CodeOption="0x0800:0xffff;0x0801:0xfb01;"
 				</Body>
 			</Option>
+			GenerateMakeFile="TRUE"
+			DontOpenReportFile="FALSE"
 		</Configuration>
 	</Configurations>
 	<FilesTab>
@@ -135,6 +137,21 @@
 				<Properties>
 				</Properties>
 			</File>
+			<File>
+				FilePath=".\\define.h"
+				<Properties>
+				</Properties>
+			</File>
+			<File>
+				FilePath=".\\define_data.h"
+				<Properties>
+				</Properties>
+			</File>
+			<File>
+				FilePath=".\\define_function.h"
+				<Properties>
+				</Properties>
+			</File>
 		</Folder>
 		<Folder>
 			<Properties>
@@ -142,7 +159,49 @@
 			Name="Source Files"
 			Filter="c;asm"
 			<File>
+				FilePath=".\\adc.c"
+				Flags="0x000004CF"
+				<Properties>
+				</Properties>
+			</File>
+			<File>
+				FilePath="..\\..\\..\\..\\Tools\\Chipsea\\CSU-IDE V5.1.2\\Example\\CSU8RP32XX\\C\\CSU8RP321X_C_example\\check_list.asm"
+				Flags="0x000004CF"
+				<Properties>
+				</Properties>
+			</File>
+			<File>
+				FilePath=".\\data.c"
+				Flags="0x000004CF"
+				<Properties>
+				</Properties>
+			</File>
+			<File>
+				FilePath=".\\delay.c"
+				Flags="0x000004CF"
+				<Properties>
+				</Properties>
+			</File>
+			<File>
+				FilePath=".\\initialization.c"
+				Flags="0x000004CF"
+				<Properties>
+				</Properties>
+			</File>
+			<File>
+				FilePath=".\\lowpower.c"
+				Flags="0x000004CF"
+				<Properties>
+				</Properties>
+			</File>
+			<File>
 				FilePath=".\\main.c"
+				Flags="0x000004CF"
+				<Properties>
+				</Properties>
+			</File>
+			<File>
+				FilePath=".\\pwm.c"
 				Flags="0x000004CF"
 				<Properties>
 				</Properties>

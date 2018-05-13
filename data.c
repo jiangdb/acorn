@@ -1,6 +1,24 @@
 //============================================
 // global variable
 //============================================
+
+sbit if_key_press;
+sbit if_usb_plug;
+sbit if_adapter_plug;
+sbit heating_low;
+sbit B_low_battery_shutdown;
+sbit B_low_battery_warning;
+
+//working mode
+unsigned char work_mode = WORK_MODE_SHUTDOWN;
+
+//ADC
+unsigned int AdData;                //ADC采样数据
+unsigned int CurTabData;			//读表数据寄存器
+unsigned char R_AdcStation1_Cnt,R_AdcStation2_Cnt,R_AdcStation3_Cnt;
+
+
+
 sbit B_200ms;
 sbit B_urr;
 sbit B_urt;
@@ -38,6 +56,13 @@ sbit B_Sleep;
 //位定义初始化
 void Bit_Initialization(void)
 {
-	if_adc=1;						//if_adc为1时，采集的是pt3.1口的电压值；if_adc为0时，采集的是芯片内部参考电压的AD值 
-	if_pwm=0;                       //if_pwm为1时，输出pwm2作蜂鸣器输出；if_pwm为0时，输出互补pwm3                      		
+	if_key_press = 0;
+	if_usb_plug = 0;
+	if_adapter_plug = 0;
+	
+	heating_low = 0;  //default in low level
+	B_low_battery_shutdown = 0;
+	B_low_battery_warning = 0;
+	
+	B_pwm2 = 0;
 }

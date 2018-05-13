@@ -6,13 +6,27 @@
 <Solution>
 	NAME : Acron
 	GUID : {91BF9983-192A-4DA8-895E-0CD57BAD49AF}
+	STARTUP : {45A2EB9B-3968-41A9-A6AF-F4AF02B6C735}
+	ACTIVECONFIGURATION : Release
 </Solution>
 # End Solution
 
 # ////////////////////////////////////////////////////
 # Begin Project
 <Projects>
-	COUNT : 0
+	COUNT : 2
+	<Project1>
+		NAME : Acron
+		GUID : {EB98EA65-2EAD-4A0D-B622-ED496CEAD472}
+		PATH : .\Acron.csuprjx
+		Dependencies : 
+	</Project1>
+	<Project2>
+		NAME : 3216_C_DEMO
+		GUID : {45A2EB9B-3968-41A9-A6AF-F4AF02B6C735}
+		PATH : ..\..\..\..\Tools\Chipsea\CSU-IDE V5.1.2\Example\CSU8RP32XX\C\CSU8RP321X_C_example\3216_C_DEMO.csuprj
+		Dependencies : 
+	</Project2>
 </Projects>
 
 # End Project

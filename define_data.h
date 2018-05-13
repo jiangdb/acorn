@@ -3,6 +3,25 @@
 #ifndef  	_define_data_h
 #define 	_define_data_h 1
 
+#define WORK_MODE_SHUTDOWN		0	
+#define WORK_MODE_HEATING		1	
+#define WORK_MODE_CHARGING		2	
+#define WORK_MODE_DISCHARGING	3	
+
+extern unsigned char work_mode;
+
+extern sbit if_key_press;
+extern sbit if_usb_plug;
+extern sbit if_adapter_plug;
+extern sbit heating_low;
+extern sbit B_low_battery_shutdown;
+extern sbit B_low_battery_warning;
+
+
+
+
+
+
 #define led3	 PT3_0
 #define led      PT1_4
 #define led1     PT1_5

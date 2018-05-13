@@ -1,3 +1,30 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <UserOptions>
+	<GPlusSetting>
+	</GPlusSetting>
+	<OpenState>
+		<OpenFiles>
+			Path=".\\main.c"
+			Path=".\\CSU8RP3216.h"
+			Path=".\\adc.c"
+			Path=".\\data.c"
+			Path=".\\pwm.c"
+			Path=".\\lowpower.c"
+			Path=".\\define_function.h"
+			Path=".\\define_data.h"
+			Path=".\\initialization.c"
+			State="318,11449,11449"
+		</OpenFiles>
+		<OpenFolders>
+			<{EB98EA65-2EAD-4A0D-B622-ED496CEAD472}>
+				Expanded="TRUE"
+				Name="Header Files"
+				Name="Source Files"
+			</{EB98EA65-2EAD-4A0D-B622-ED496CEAD472}>
+			<{45A2EB9B-3968-41A9-A6AF-F4AF02B6C735}>
+				Expanded="TRUE"
+				Name="Source Files"
+			</{45A2EB9B-3968-41A9-A6AF-F4AF02B6C735}>
+		</OpenFolders>
+	</OpenState>
 </UserOptions>
