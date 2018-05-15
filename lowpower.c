@@ -24,7 +24,7 @@ void sleep()
 		则必须将TMnCON（n=2、3、4）寄存器的低2位清零。*/
 //	;----------------------------------------
 //	;IO口设置(若IO口悬空，则要置为输出或者输入带上/下拉)
-		PT1PU = 0x08;                   //I/O口上拉电阻设置                                                       
+		PT1PU = 0x02;                   //I/O口上拉电阻设置                                                       
 		PT1EN = 0xf7;					//pt1.3作输入口                                                          
 		PT1CON = 0x08;					                                                          
 		PT1 = 0x00;                                                        
@@ -32,12 +32,12 @@ void sleep()
 		PT3PU = 0x00;                                                       
 		PT3EN = 0x00;                                                                        
 		PT3CON = 0x00;                                               
-		PT3 = 0x00;                                                                       
+		PT3 = 0x60;                                                                       
 
 		PT5PU = 0x00;                                                       
 		PT5EN = 0x00;                                                                        
 		PT5CON = 0x00;                                               
-		PT5 = 0x00; 
+		PT5 = 0x03; 
 		SYSCFG1 = 0X00;					//关P3.4，3.6口的默认下拉
 //	;----------------------------------------
 //	;UART设置
@@ -67,5 +67,6 @@ void sleep()
 		asm("clrwdt");
 		delay();
 		MCU_Initialization();		   	//调用初始化函数
+		Bit_Initialization();
 	}
 }

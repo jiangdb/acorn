@@ -45,51 +45,125 @@
 
 
 void shutdown_handler() {
-	//check if key pressed for 2s
-	//check if adapter plug in
-	//check if USB OTG plug in
+	//reset timer count
+	t500ms_count = 0;
+	t2s_count = 0;
+	B_500ms = 0;
+	B_2s = 0;
+	while(1)
+	{
+		//check if adapter plug in
+		if ( PT1_2 ) {
+			work_mode = WORK_MODE_CHARGING;
+			break;
+		}
+		//check if USB OTG plug in
+		if ( !PT1_7 ) {
+			work_mode = WORK_MODE_DISCHARGING;
+			break;
+		}
+		//check if key pressed for 2s
+		if ( !PT3_0 && B_2s) {
+			work_mode = WORK_MODE_HEATING;
+			break;
+		}
+	}
 }
 
 void heating_handler() {
-	//check if key pressed short
-	//check if key pressed 2s
-	//check if adapter plug in
-	//check if USB OTG plug in
-	//check battery level
-	adc_battery();
-	if (low_battery_shutdown) {
+	B_key_waitfor_release = 0;
+	B_heat_level_low = 1;
+	B_heating = 0;
+	while(1)
+	{
+		//check if adapter plug in
+		if ( PT1_2 ) {
+			work_mode = WORK_MODE_CHARGING;
+			break;
+		}
+		//check if USB OTG plug in
+		if ( !PT1_7 ) {
+			work_mode = WORK_MODE_DISCHARGING;
+			break;
+		}
+		//check battery level
+		adc_battery();
+		if (B_low_battery_shutdown) {
+			work_mode = WORK_MODE_SHUTDOWN;
+			B_Sleep = 1;
+			break;
+		}
+		//check if key pressed short
+		if (B_key_pressed) {
+			if ( !B_key_waitfor_release ) {
+				B_key_waitfor_release = 1;
+				t500ms_count = 0;
+				t2s_count = 0;
+				B_500ms = 0;
+				B_2s = 0;
+			}
+
+			//2s shutdown
+			if ( B_2s ) {
+				work_mode = WORK_MODE_SHUTDOWN;
+				B_Sleep = 1;
+				break;
+			}
+		} else {
+			B_key_waitfor_release = 0;
+			// swith heat level
+		}
+
+		//get temperature
+		adc_temp1();
+		//if heating
+		//	if temp large than level, stop heating
+		//else
+		//	if temp lower than level - 10 degree, start heating
 	}
-	//get temperature
-	//check if need heat or not
 }
 
 void charging_handler() {
-	//check if in charging
-	//check if charge full
-	//check if adapter unplugged
+	while(1)
+	{
+		//check if adapter unplugged
+		if ( PT1_2 ) {
+			// count 500ms first
+			t200ms_count = 0;
+			t800ms_count = 0;
+			B_200ms = 0;
+			B_800ms = 0;
+		} else {
+			if ( B_800ms) {
+				//adapter unplugged
+				work_mode = WORK_MODE_SHUTDOWN;
+				B_Sleep = 1;
+				break;
+			}
+		}
+	}
 }
 
 void discharging_handler() {
 	//turn on white led
 	PT5_0 = 1;
+	PT1_6 = 1;
+	PT5_1 = 0;
 	//enter work loop
 	while(1)
 	{
-		asm("clrwdt");				//清看门狗    
+		asm("clrwdt");				//清看门狗
 		//check if USB OTG unpluged
-		if (!if_usb_plug) {
-			//should shutdown
-			work_mode = WORK_MODE_SHUTDOWNl;
+		if (PT1_7) {
+			//unplugged, should shutdown
+			work_mode = WORK_MODE_SHUTDOWN;
 			B_Sleep = 1;
 			break;
 		}
 
 		//check battery level
 		adc_battery();
-		if ( B_low_battery_warning) {
-			//red led flash
-			
-		} else if ( B_low_battery_shutdown ) {
+		if ( B_low_battery_shutdown ) {
 			//should shutdown
 			work_mode = WORK_MODE_SHUTDOWN;
 			B_Sleep = 1;
@@ -104,6 +178,7 @@ int main()
 	delay();						//上电延时
 	MCU_Initialization();			//芯片初始化	
 	Bit_Initialization();           //位定义初始化（新版C不需要做全局变量初始化，直接在定义时初始化即可,但BIT位定义不能在定义时初始化）	
+	work_mode = WORK_MODE_SHUTDOWN;
 	while(1)
 	{
 		asm("clrwdt");				//清看门狗    
@@ -137,38 +212,43 @@ void INT_FUNCTION(void) interrupt
 {
 	if(E0IF)						//判断是否为外部中断0
 	{
-		E0IF=0;		
+		E0IF=0;	
+		if ( PT3_0 ) {
+			B_key_pressed = 0;
+		} else {
+			B_key_pressed = 1;
+		}
 	}
 
 	else if(E1IF)					//判断是否为外部中断1        
 	{                                                            
 		E1IF=0;
-		//check if key or USB OTG or adapter
 	}                                                            
 	else if(TM0IF)                  //判断是否为定时器0溢出中断  
 	{                                                            
-		TM0IF=0;                    //是则清定时器0中断标志      
-		t200ms_count++;             //计时200ms       	
-		if(t200ms_count>=50)		               
-		{                                          
-			B_200ms=1;              //置计时200ms标志
-		}
-		t1s_count++;                                             
-		if(t1s_count>=125)			//计时500ms                  
-		{
-			t1s_count=0;
-			led=!led;				//每500ms闪烁一次led灯			
-			if(t10s_count>=60)		//计时30s	          
-			{                                             
-				TM3CON=0X00;        //30s后关闭互补pwm3   
-				TM3CON2=0X00;                             
-				B_Time500ms=0;      //30s后关闭蜂鸣器
-				B_Sleep=1;			//30s后进入休眠模式
+		TM0IF=0;                    //是则清定时器0中断标志     
+
+		//计时200ms 
+		t200ms_count++;						      	
+		if(t200ms_count>=50)				//4ms * 50 = 200ms
+		{   
+			t200ms_count = 0;
+			B_200ms = 1;						//置计时200ms标志
+			t800ms_count++;
+			if (t800ms_count >=4 ) {
+				t800ms_count = 0;
+				B_800ms=1;						//置计时800ms标志
 			}
-			else
-			{
-				t10s_count++;
-				B_Time500ms=!B_Time500ms;//每500ms翻转一次B_Time500ms标志位   
+		}
+		
+		//计时500ms 
+		t500ms_count++;                                             
+		if(t500ms_count>=125)				//4ms * 125 = 500ms         
+		{
+			t500ms_count=0;
+			B_500ms = 1;					//置计时500ms标志
+			if (B_low_battery_warning) {
+				red_led=!red_led;			//每500ms闪烁一次RED灯			
 			}
 		}
 	}
@@ -186,13 +266,11 @@ void INT_FUNCTION(void) interrupt
 	else if(URRIF)					//判断是否为UART接收中断
 	{
 		URRIF=0;
-		B_urr=1;					//UART数据接收标志位置1		
 	}
 
 	else if(URTIF)					//判断是否为UART发送中断
 	{
 		URTIF=0;
-		B_urt=1;					//UART数据发送标志位置1		
 	}
 
 }

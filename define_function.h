@@ -28,17 +28,11 @@ extern void adc_temp2();
 extern void ad_voltage_collect();
 //ADC´¦Àíº¯Êý
 extern void battery_deal();
-extern void temp1_deal();
-extern void temp2_deal();
+extern void temp_deal();
 /*-------------------------------------------------
 lowpower.c
 -------------------------------------------------*/
 extern void sleep(void);
-/*-------------------------------------------------
-pwm.c
--------------------------------------------------*/
-extern void open_pwm(void);
-
 #endif 
 
 

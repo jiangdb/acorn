@@ -15,7 +15,7 @@ void adc_temp1()
 	SRADCON1=0X80;			//使能AD转换，VDD作参考电压
 	SRADCON2=0X30;			//设置pt3.3口为输入通道
 	ad_voltage_collect();
-	temp_deal()
+	temp_deal();
 }
 
 void adc_temp2()
@@ -23,7 +23,7 @@ void adc_temp2()
 	SRADCON1=0X80;			//使能AD转换，VDD作参考电压
 	SRADCON2=0X40;			//设置pt3.4口为输入通道
 	ad_voltage_collect();
-	temp_deal()
+	temp_deal();
 }
 
 //ADC采集函数
@@ -59,6 +59,9 @@ void battery_deal()
 	asm("movfw	_EDATH");
 	asm("movwf	_CurTabData+1");		//表值
 	
+	B_low_battery_shutdown = 0;
+	B_low_battery_warning = 0;
+
 	if(AdData<CurTabData)				//比较表值和采集到的AD值
 	{									//若AD值小则关led1,led2指示灯                 
 		R_AdcStation2_Cnt=0;                                                          
@@ -67,7 +70,7 @@ void battery_deal()
 		if(R_AdcStation1_Cnt>=20)       //滤波计数                                    
 		{                               //连续20次AD值比第一个表值小则shutdown  
 			R_AdcStation1_Cnt=0;
-			low_battery_shutdown = 1;
+			B_low_battery_shutdown = 1;
 		}                                                                             
 	}                                                                                 
 	else 			
@@ -90,7 +93,7 @@ void battery_deal()
 			if(R_AdcStation2_Cnt>=10)	//滤波计数                                       
 			{                           //连续10次AD值比第二个表值小则warning     
 				R_AdcStation2_Cnt=0;
-				low_battery_warning = 1;
+				B_low_battery_warning = 1;
 			}                                                                            
 		}                                                                                
 	}
@@ -116,7 +119,6 @@ void temp_deal()
 		if(R_AdcStation1_Cnt>=20)       //滤波计数                                    
 		{                               //连续20次AD值比第一个表值小则shutdown  
 			R_AdcStation1_Cnt=0;
-			low_battery_shutdown = 1;
 		}                                                                             
 	}                                                                                 
 	else 			
@@ -139,7 +141,6 @@ void temp_deal()
 			if(R_AdcStation2_Cnt>=10)	//滤波计数                                       
 			{                           //连续10次AD值比第二个表值小则warning     
 				R_AdcStation2_Cnt=0;
-				low_battery_warning = 1;
 			}                                                                            
 		}                                                                                
 	}
