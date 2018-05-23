@@ -54,22 +54,37 @@ OUTPUT_OTHER_FILES	  = "$(INTERTMP_DIR)\*.asm" \
 ###################################################
 #.C文件到.ASM文件
 ###################################################
-"$(INTERTMP_DIR)\adc.asm" : "D:\workspace\projects\acorn\adc.c"
+"$(INTERTMP_DIR)\adc.asm" : "D:\workspace\projects\acorn\adc.c" \
+ "D:\workspace\projects\acorn\CSU8RP3216.h" \
+ "D:\workspace\projects\acorn\define_function.h" \
+ "D:\workspace\projects\acorn\define_data.h"
 	$(CC) $(CFLAGS)  "D:\workspace\projects\acorn\adc.c" -o "$(INTERTMP_DIR)\adc.asm" 
 	$(ECHO)
 "$(INTERTMP_DIR)\data.asm" : "D:\workspace\projects\acorn\data.c"
 	$(CC) $(CFLAGS)  "D:\workspace\projects\acorn\data.c" -o "$(INTERTMP_DIR)\data.asm" 
 	$(ECHO)
-"$(INTERTMP_DIR)\delay.asm" : "D:\workspace\projects\acorn\delay.c"
+"$(INTERTMP_DIR)\delay.asm" : "D:\workspace\projects\acorn\delay.c" \
+ "D:\workspace\projects\acorn\define_function.h" \
+ "D:\workspace\projects\acorn\define_data.h" \
+ "D:\workspace\projects\acorn\CSU8RP3216.h"
 	$(CC) $(CFLAGS)  "D:\workspace\projects\acorn\delay.c" -o "$(INTERTMP_DIR)\delay.asm" 
 	$(ECHO)
-"$(INTERTMP_DIR)\initialization.asm" : "D:\workspace\projects\acorn\initialization.c"
+"$(INTERTMP_DIR)\initialization.asm" : "D:\workspace\projects\acorn\initialization.c" \
+ "D:\workspace\projects\acorn\CSU8RP3216.h" \
+ "D:\workspace\projects\acorn\define_function.h" \
+ "D:\workspace\projects\acorn\define_data.h"
 	$(CC) $(CFLAGS)  "D:\workspace\projects\acorn\initialization.c" -o "$(INTERTMP_DIR)\initialization.asm" 
 	$(ECHO)
-"$(INTERTMP_DIR)\lowpower.asm" : "D:\workspace\projects\acorn\lowpower.c"
+"$(INTERTMP_DIR)\lowpower.asm" : "D:\workspace\projects\acorn\lowpower.c" \
+ "D:\workspace\projects\acorn\CSU8RP3216.h" \
+ "D:\workspace\projects\acorn\define_function.h" \
+ "D:\workspace\projects\acorn\define_data.h"
 	$(CC) $(CFLAGS)  "D:\workspace\projects\acorn\lowpower.c" -o "$(INTERTMP_DIR)\lowpower.asm" 
 	$(ECHO)
-"$(INTERTMP_DIR)\main.asm" : "D:\workspace\projects\acorn\main.c"
+"$(INTERTMP_DIR)\main.asm" : "D:\workspace\projects\acorn\main.c" \
+ "D:\workspace\projects\acorn\CSU8RP3216.h" \
+ "D:\workspace\projects\acorn\define_function.h" \
+ "D:\workspace\projects\acorn\define_data.h"
 	$(CC) $(CFLAGS)  "D:\workspace\projects\acorn\main.c" -o "$(INTERTMP_DIR)\main.asm" 
 	$(ECHO)
 "$(INTERTMP_DIR)\SysRegDefine.asm" : "D:\workspace\projects\acorn\SysRegDefine.c"

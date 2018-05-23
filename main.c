@@ -45,47 +45,72 @@
 
 
 void shutdown_handler() {
-	//reset timer count
-	t500ms_count = 0;
-	t2s_count = 0;
-	B_500ms = 0;
-	B_2s = 0;
-	while(1)
+	B_Sleep = 1;
+	//check if adapter plug in
+	if ( PT1_2 && PT1_7) {
+		work_mode = WORK_MODE_CHARGING;
+		B_Sleep = 0;
+		return;
+	}
+	//check if USB OTG plug in
+	if ( PT1_2 && !PT1_7 ) {
+		work_mode = WORK_MODE_DISCHARGING;
+		B_Sleep = 0;
+		return;
+	}
+
+	B_key_waitfor_release = 0;
+	while(B_key_pressed)
 	{
-		//check if adapter plug in
-		if ( PT1_2 ) {
-			work_mode = WORK_MODE_CHARGING;
-			break;
-		}
-		//check if USB OTG plug in
-		if ( !PT1_7 ) {
-			work_mode = WORK_MODE_DISCHARGING;
-			break;
-		}
-		//check if key pressed for 2s
-		if ( !PT3_0 && B_2s) {
-			work_mode = WORK_MODE_HEATING;
-			break;
+		asm("clrwdt");				//清看门狗
+		if (!PT3_0) {
+			//still pressed
+			if ( !B_key_waitfor_release ) {
+				B_key_waitfor_release = 1;
+				//reset timer count
+				t500ms_count = 0;
+				t2s_count = 0;
+				B_500ms = 0;
+				B_2s = 0;
+			}
+			//2s shutdown
+			if ( B_2s ) {
+				work_mode = WORK_MODE_HEATING;
+				B_Sleep = 0;
+				break;
+			}
+		} else {
+			//key released, quit loop
+			B_key_pressed = 0;
+			B_key_waitfor_release = 0;
 		}
 	}
 }
 
 void heating_handler() {
+    B_key_pressed = 0;
 	B_key_waitfor_release = 0;
 	B_heat_level_low = 1;
 	B_heating = 0;
+	white_led = 1;
+	blue_led = 1;
+	red_led = 1;
+	test = 0;
 	while(1)
 	{
+		asm("clrwdt");				//清看门狗
+
 		//check if adapter plug in
-		if ( PT1_2 ) {
+		if ( PT1_2 && PT1_7 ) {
 			work_mode = WORK_MODE_CHARGING;
 			break;
 		}
 		//check if USB OTG plug in
-		if ( !PT1_7 ) {
+		if ( PT1_2 && !PT1_7 ) {
 			work_mode = WORK_MODE_DISCHARGING;
 			break;
 		}
+		/*
 		//check battery level
 		adc_battery();
 		if (B_low_battery_shutdown) {
@@ -93,29 +118,50 @@ void heating_handler() {
 			B_Sleep = 1;
 			break;
 		}
+		*/
 		//check if key pressed short
 		if (B_key_pressed) {
-			if ( !B_key_waitfor_release ) {
-				B_key_waitfor_release = 1;
-				t500ms_count = 0;
-				t2s_count = 0;
-				B_500ms = 0;
-				B_2s = 0;
-			}
+			if (!PT3_0) {
+				//key keep pressed
+				if ( !B_key_waitfor_release ) {
+					B_key_waitfor_release = 1;
+					t500ms_count = 0;
+					t2s_count = 0;
+					B_500ms = 0;
+					B_2s = 0;
+				}
 
-			//2s shutdown
-			if ( B_2s ) {
-				work_mode = WORK_MODE_SHUTDOWN;
-				B_Sleep = 1;
-				break;
+				//2s shutdown
+				if ( B_2s ) {
+					work_mode = WORK_MODE_SHUTDOWN;
+					B_Sleep = 1;
+					break;
+				}
+			} else {
+				//key released
+				B_key_pressed = 0;
+				if (B_key_waitfor_release) {
+					// swith heat level
+					B_heat_level_low = !B_heat_level_low;
+					test++;
+				}
+				B_key_waitfor_release = 0;
 			}
-		} else {
-			B_key_waitfor_release = 0;
-			// swith heat level
 		}
-
+		
+		//set led
+		if (B_heat_level_low) {
+			//low level, enable blue led
+			blue_led = 0;
+			red_led = 1;
+		} else {
+			//high level, enable red led
+			red_led = 0;
+			blue_led = 1;
+		}
+		
 		//get temperature
-		adc_temp1();
+		//adc_temp1();
 		//if heating
 		//	if temp large than level, stop heating
 		//else
@@ -124,31 +170,27 @@ void heating_handler() {
 }
 
 void charging_handler() {
+	white_led = 1;
+	blue_led = 1;
+	red_led = 1;
 	while(1)
 	{
+		asm("clrwdt");				//清看门狗
 		//check if adapter unplugged
-		if ( PT1_2 ) {
-			// count 500ms first
-			t200ms_count = 0;
-			t800ms_count = 0;
-			B_200ms = 0;
-			B_800ms = 0;
-		} else {
-			if ( B_800ms) {
-				//adapter unplugged
-				work_mode = WORK_MODE_SHUTDOWN;
-				B_Sleep = 1;
-				break;
-			}
+		if ( !PT1_2 ) {
+			//adapter unplugged
+			work_mode = WORK_MODE_SHUTDOWN;
+			B_Sleep = 1;
+			break;
 		}
 	}
 }
 
 void discharging_handler() {
 	//turn on white led
-	PT5_0 = 1;
-	PT1_6 = 1;
-	PT5_1 = 0;
+	white_led = 0;
+	red_led = 1;
+	blue_led = 1;
 	//enter work loop
 	while(1)
 	{
@@ -161,6 +203,7 @@ void discharging_handler() {
 			break;
 		}
 
+		/*
 		//check battery level
 		adc_battery();
 		if ( B_low_battery_shutdown ) {
@@ -169,6 +212,7 @@ void discharging_handler() {
 			B_Sleep = 1;
 			break;
 		}
+		*/
 	}
 }
 
@@ -213,9 +257,7 @@ void INT_FUNCTION(void) interrupt
 	if(E0IF)						//判断是否为外部中断0
 	{
 		E0IF=0;	
-		if ( PT3_0 ) {
-			B_key_pressed = 0;
-		} else {
+		if ( ! PT3_0 ) {
 			B_key_pressed = 1;
 		}
 	}
@@ -234,21 +276,18 @@ void INT_FUNCTION(void) interrupt
 		{   
 			t200ms_count = 0;
 			B_200ms = 1;						//置计时200ms标志
-			t800ms_count++;
-			if (t800ms_count >=4 ) {
-				t800ms_count = 0;
-				B_800ms=1;						//置计时800ms标志
-			}
 		}
 		
 		//计时500ms 
 		t500ms_count++;                                             
-		if(t500ms_count>=125)				//4ms * 125 = 500ms         
+		if(t500ms_count>=125)					//4ms * 125 = 500ms         
 		{
 			t500ms_count=0;
-			B_500ms = 1;					//置计时500ms标志
-			if (B_low_battery_warning) {
-				red_led=!red_led;			//每500ms闪烁一次RED灯			
+			B_500ms = 1;						//置计时500ms标志
+			t2s_count++;
+			if (t2s_count >=4 ) {
+				t2s_count = 0;
+				B_2s=1;						//置计时800ms标志
 			}
 		}
 	}

@@ -49,4 +49,6 @@ extern unsigned char t1s_count;
 extern unsigned char t2s_count;
 extern unsigned char t10s_count;
 
+extern int test;
+
 #endif 

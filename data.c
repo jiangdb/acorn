@@ -40,6 +40,8 @@ unsigned char t1s_count;
 unsigned char t2s_count;
 unsigned char t10s_count;
 
+
+int test;
 //const unsigned int a[2]={0x0c71,0x0e38}; //2.5V 2.9V ADC采样比较值,常量数组，数据存储在RAM里
 
 //位定义初始化

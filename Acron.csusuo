@@ -12,8 +12,9 @@
 			Path=".\\lowpower.c"
 			Path=".\\define_function.h"
 			Path=".\\define_data.h"
+			Path="C:\\Program Files\\Chipsea\\CSU-IDE V5.1.2\\Example\\_index_.html"
 			Path=".\\initialization.c"
-			State="318,11449,11449"
+			State="161,5841,5841"
 		</OpenFiles>
 		<OpenFolders>
 			<{EB98EA65-2EAD-4A0D-B622-ED496CEAD472}>
@@ -21,10 +22,41 @@
 				Name="Header Files"
 				Name="Source Files"
 			</{EB98EA65-2EAD-4A0D-B622-ED496CEAD472}>
-			<{45A2EB9B-3968-41A9-A6AF-F4AF02B6C735}>
-				Expanded="TRUE"
-				Name="Source Files"
-			</{45A2EB9B-3968-41A9-A6AF-F4AF02B6C735}>
 		</OpenFolders>
 	</OpenState>
+	<UI_dockbar_disassembler>
+		AddressList=""
+	</UI_dockbar_disassembler>
+	<UI_dockbar_memory1>
+		ViewAddress=""
+		AddressList=""
+	</UI_dockbar_memory1>
+	<UI_dockbar_memory2>
+		ViewAddress=""
+		AddressList=""
+	</UI_dockbar_memory2>
+	<UI_dockbar_memory3>
+		ViewAddress=""
+		AddressList=""
+	</UI_dockbar_memory3>
+	<UI_dockbar_memory4>
+		ViewAddress=""
+		AddressList=""
+	</UI_dockbar_memory4>
+	<UI_dockbar_memory5>
+		ViewAddress=""
+		AddressList=""
+	</UI_dockbar_memory5>
+	<UI_dockbar_registers>
+		ActiveRegGroup="SFR"
+	</UI_dockbar_registers>
+	<Breakpoints>
+	</Breakpoints>
+	<WatchVariables>
+		<dockbar_watch1>
+			<Variable>
+				Name="test"
+			</Variable>
+		</dockbar_watch1>
+	</WatchVariables>
 </UserOptions>
