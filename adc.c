@@ -58,11 +58,8 @@ void battery_deal()
 	asm("movwf	_CurTabData");
 	asm("movfw	_EDATH");
 	asm("movwf	_CurTabData+1");		//表值
-	
-	B_low_battery_shutdown = 0;
-	B_low_battery_warning = 0;
 
-	if(AdData<CurTabData)				//比较表值和采集到的AD值
+	if(AdData<=CurTabData)				//比较表值和采集到的AD值
 	{									//若AD值小则关led1,led2指示灯                 
 		R_AdcStation2_Cnt=0;                                                          
 		R_AdcStation3_Cnt=0;                                                          

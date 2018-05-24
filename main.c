@@ -52,6 +52,13 @@ void shutdown_handler() {
 		B_Sleep = 0;
 		return;
 	}
+
+	//if low battery, can't start
+	adc_battery();
+	if (B_low_battery_warning) {
+		return;
+	}
+
 	//check if USB OTG plug in
 	if ( PT1_2 && !PT1_7 ) {
 		work_mode = WORK_MODE_DISCHARGING;
@@ -100,6 +107,13 @@ void heating_handler() {
 	{
 		asm("clrwdt");				//清看门狗
 
+		//check battery
+		adc_battery();
+		if (B_low_battery_shutdown) {
+			work_mode = WORK_MODE_SHUTDOWN;
+			B_Sleep = 1;
+			break;
+		}
 		//check if adapter plug in
 		if ( PT1_2 && PT1_7 ) {
 			work_mode = WORK_MODE_CHARGING;
@@ -110,15 +124,7 @@ void heating_handler() {
 			work_mode = WORK_MODE_DISCHARGING;
 			break;
 		}
-		/*
-		//check battery level
-		adc_battery();
-		if (B_low_battery_shutdown) {
-			work_mode = WORK_MODE_SHUTDOWN;
-			B_Sleep = 1;
-			break;
-		}
-		*/
+
 		//check if key pressed short
 		if (B_key_pressed) {
 			if (!PT3_0) {
@@ -140,27 +146,29 @@ void heating_handler() {
 			} else {
 				//key released
 				B_key_pressed = 0;
-				if (B_key_waitfor_release) {
+				if (B_key_waitfor_release && B_52ms) {
 					// swith heat level
 					B_heat_level_low = !B_heat_level_low;
-					test++;
 				}
 				B_key_waitfor_release = 0;
 			}
 		}
 		
 		//set led
-		if (B_heat_level_low) {
-			//low level, enable blue led
-			blue_led = 0;
-			red_led = 1;
-		} else {
-			//high level, enable red led
-			red_led = 0;
-			blue_led = 1;
+		if (!B_low_battery_warning) {	
+			//set led
+			if (B_heat_level_low) {
+				//low level, enable blue led
+				blue_led = 0;
+				red_led = 1;
+			} else {
+				//high level, enable red led
+				red_led = 0;
+				blue_led = 1;
+			}
 		}
-		
-		//get temperature
+
+		//detect temperature
 		//adc_temp1();
 		//if heating
 		//	if temp large than level, stop heating
@@ -191,6 +199,13 @@ void discharging_handler() {
 	white_led = 0;
 	red_led = 1;
 	blue_led = 1;
+	//some hardware requirement
+	PT1_1 = 0;
+	PT1_6 = 1;
+	PT5_1 = 0;
+	//500ms for pt1.1
+	t500ms_count=0;
+	B_500ms = 0;
 	//enter work loop
 	while(1)
 	{
@@ -202,8 +217,11 @@ void discharging_handler() {
 			B_Sleep = 1;
 			break;
 		}
+		
+		if (B_500ms) {
+			PT1_1 = 1;
+		}
 
-		/*
 		//check battery level
 		adc_battery();
 		if ( B_low_battery_shutdown ) {
@@ -212,7 +230,6 @@ void discharging_handler() {
 			B_Sleep = 1;
 			break;
 		}
-		*/
 	}
 }
 
@@ -257,8 +274,10 @@ void INT_FUNCTION(void) interrupt
 	if(E0IF)						//判断是否为外部中断0
 	{
 		E0IF=0;	
-		if ( ! PT3_0 ) {
+		if ( !PT3_0 ) {
 			B_key_pressed = 1;
+			B_52ms = 0;
+			t52ms_count = 0;
 		}
 	}
 
@@ -270,24 +289,37 @@ void INT_FUNCTION(void) interrupt
 	{                                                            
 		TM0IF=0;                    //是则清定时器0中断标志     
 
-		//计时200ms 
-		t200ms_count++;						      	
-		if(t200ms_count>=50)				//4ms * 50 = 200ms
-		{   
-			t200ms_count = 0;
-			B_200ms = 1;						//置计时200ms标志
+		//when key pressed, 计时52ms
+		if (B_key_pressed) {
+			t52ms_count++;						      	
+			if(t52ms_count>=13)				//4ms * 13 = 52ms
+			{   
+				t52ms_count = 0;
+				B_52ms = 1;					//置计时52ms标志
+			}
 		}
-		
+
 		//计时500ms 
 		t500ms_count++;                                             
 		if(t500ms_count>=125)					//4ms * 125 = 500ms         
 		{
 			t500ms_count=0;
 			B_500ms = 1;						//置计时500ms标志
-			t2s_count++;
-			if (t2s_count >=4 ) {
-				t2s_count = 0;
-				B_2s=1;						//置计时800ms标志
+			if (B_low_battery_warning) {
+				red_led = !red_led;
+			}
+		}
+		
+		//计时2s 
+		t2s_count++;
+		if (t2s_count >=500 ) {					//4ms * 500 = 2s    
+			t2s_count = 0;
+			B_2s = 1;						    //置计时2s标志
+			
+			t10s_count++;
+			if (t10s_count >=5) {
+				t10s_count = 0;
+				B_10s = 1;
 			}
 		}
 	}

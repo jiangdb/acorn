@@ -55,7 +55,10 @@
 	<WatchVariables>
 		<dockbar_watch1>
 			<Variable>
-				Name="test"
+				Name="B_low_battery_shutdown"
+			</Variable>
+			<Variable>
+				Name="B_low_battery_warning"
 			</Variable>
 		</dockbar_watch1>
 	</WatchVariables>
